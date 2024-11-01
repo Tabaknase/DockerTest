@@ -5,7 +5,7 @@ services:
   webserver:
     image: nginx:latest
     ports:
-      - "80:80"  # Der Nginx-Webserver wird unter localhost:80 verfügbar sein.
+      - "80:80"
     networks:
       - app-network
 
@@ -13,26 +13,35 @@ services:
   db:
     image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: password  # Passwort für den MySQL root-Benutzer
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
     volumes:
-      - db_data:/var/lib/mysql  # Persistentes Volumen für MySQL-Daten
+      - db_data:/var/lib/mysql
     networks:
       - app-network
 
-  # Adminer als Weboberfläche für MySQL
+  # Adminer zur Verwaltung der MySQL-Datenbank
   adminer:
     image: adminer:latest
     ports:
-      - "8080:8080"  # Adminer wird unter localhost:8080 verfügbar sein
+      - "8080:8080"
     networks:
       - app-network
     depends_on:
       - db
 
-# Netzwerk für die Kommunikation der Services
+  # Node.js API Server
+  api:
+    build: .  # Baut das Docker-Image für den Node.js-Service mit dem Dockerfile im aktuellen Verzeichnis
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    depends_on:
+      - db
+
 networks:
   app-network:
 
-# Volumen für persistente Speicherung der Datenbank
 volumes:
   db_data:
