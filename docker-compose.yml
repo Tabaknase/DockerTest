@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Nginx Webserver
+  webserver:
+    image: nginx:latest
+    ports:
+      - "80:80"  # Der Nginx-Webserver wird unter localhost:80 verfügbar sein.
+    networks:
+      - app-network
+
+  # MySQL-Datenbank
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password  # Passwort für den MySQL root-Benutzer
+    volumes:
+      - db_data:/var/lib/mysql  # Persistentes Volumen für MySQL-Daten
+    networks:
+      - app-network
+
+  # Adminer als Weboberfläche für MySQL
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"  # Adminer wird unter localhost:8080 verfügbar sein
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+# Netzwerk für die Kommunikation der Services
+networks:
+  app-network:
+
+# Volumen für persistente Speicherung der Datenbank
+volumes:
+  db_data:
